@@ -115,7 +115,7 @@ df["Проблема лічильника"] = np.where(
 )
 
 # =========================
-# TABLE SETTINGS
+# TABLE
 # =========================
 show_comments = st.sidebar.toggle(
     "Показувати коментар ревізора",
@@ -141,7 +141,10 @@ ordered_cols = existing_main + other_cols
 if not show_comments and "Коментар ревізора" in ordered_cols:
     ordered_cols.remove("Коментар ревізора")
 
-df_display = df[ordered_cols].copy()
+# 👉 ВАЖЛИВО: сортуємо ПО ДАТІ ДО форматування
+df_sorted = df.sort_values("Дата", ascending=False)
+
+df_display = df_sorted[ordered_cols].copy()
 df_display["Дата"] = df_display["Дата"].dt.strftime("%d-%m-%Y")
 
 def highlight_negative(val):
@@ -149,14 +152,9 @@ def highlight_negative(val):
         return "color: red; font-weight: bold;"
     return ""
 
-styled_df = (
-    df_display
-    .sort_values("Дата", ascending=False)
-    .style
-    .applymap(
-        highlight_negative,
-        subset=["Результат ВСЬОГО"]
-    )
+styled_df = df_display.style.applymap(
+    highlight_negative,
+    subset=["Результат ВСЬОГО"]
 )
 
 st.subheader("📋 Таблиця ревізій")
@@ -167,7 +165,7 @@ st.dataframe(
 )
 
 # =========================
-# DASHBOARDS (AFTER TABLE)
+# DASHBOARDS
 # =========================
 st.subheader("📊 Дашборди")
 
@@ -175,7 +173,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("**Динаміка результату по датах**")
-    daily = df.groupby("Дата")["Результат ВСЬОГО"].sum()
+    daily = df_sorted.groupby("Дата")["Результат ВСЬОГО"].sum()
     st.line_chart(daily)
 
 with col2:
@@ -183,16 +181,18 @@ with col2:
     avg_gram = df.groupby("ТТ Місто")["Фактична кількість кави на порцію"].mean()
     st.bar_chart(avg_gram)
 
-st.markdown("### 🔥 ТТ з найбільшими мінусами")
+st.markdown("### ТТ з найбільшими мінусами")
 
 top_loss = (
     df.groupby("ТТ Місто", as_index=False)["Результат ВСЬОГО"]
     .sum()
 )
 
-top_loss = top_loss[top_loss["Результат ВСЬОГО"] < 0] \
-    .sort_values("Результат ВСЬОГО") \
+top_loss = (
+    top_loss[top_loss["Результат ВСЬОГО"] < 0]
+    .sort_values("Результат ВСЬОГО")
     .head(10)
+)
 
 if not top_loss.empty:
     st.bar_chart(
