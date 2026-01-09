@@ -12,7 +12,7 @@ st.title("☕ Аналітика ревізій кав'ярень")
 # =========================
 # LOAD DATA
 # =========================
-DEFAULT_FILE = "data/revisions.xlsx"
+DEFAULT_FILE = "data.xlsx"
 
 uploaded_file = st.sidebar.file_uploader(
     "Завантажити файл ревізій (Excel)",
