@@ -55,6 +55,24 @@ for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
 # =========================
+# REMOVE DUPLICATES
+# =========================
+before = len(df)
+
+df = df.drop_duplicates(
+    subset=["Дата", "ТТ Місто"],
+    keep="first"
+)
+
+after = len(df)
+
+if before != after:
+    st.sidebar.warning(
+        f"⚠️ Видалено дублікатів: {before - after}"
+    )
+
+
+# =========================
 # FILTERS
 # =========================
 df["Рік"] = df["Дата"].dt.year
