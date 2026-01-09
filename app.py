@@ -112,8 +112,8 @@ df = df[
 target_gram = st.sidebar.slider(
     "Нормативний грамаж (г)",
     min_value=7.0,
-    max_value=11.0,
-    value=9.0,
+    max_value=14.0,
+    value=10.0,
     step=0.1
 )
 
